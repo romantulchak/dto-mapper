@@ -1,5 +1,6 @@
 package com.mapperDTO.mapper;
 
+import com.mapperDTO.annotation.DTO;
 import com.mapperDTO.annotation.MapToDTO;
 import com.mapperDTO.exception.CreateClassInstanceException;
 import org.hibernate.Hibernate;
@@ -11,6 +12,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.*;
 
 import static com.mapperDTO.mapper.ClassUtility.newInstanceOfType;
+
 
 @Component
 public final class EntityMapper {
@@ -30,7 +32,7 @@ public final class EntityMapper {
         for (Field busFieldOk : entityFields) {
             try {
                 busFieldOk.setAccessible(true);
-                if (field.getName().equals(busFieldOk.getName()) && checkAnnotation(field, classToCheck)) {
+                if (checkAssociatedField(field, busFieldOk) && checkAnnotation(field, classToCheck)) {
                     Object value = busFieldOk.get(entity);
                     entityFields.remove(busFieldOk);
                     if (value != null) {
@@ -48,6 +50,14 @@ public final class EntityMapper {
         }
     }
 
+    private boolean checkAssociatedField(Field field, Field fieldToCompare){
+        MapToDTO annotation = field.getDeclaredAnnotation(MapToDTO.class);
+        if (annotation != null && !annotation.associatedField().isEmpty()) {
+            return annotation.associatedField().equals(fieldToCompare.getName());
+        }
+        return field.getName().equals(fieldToCompare.getName());
+    }
+
     private boolean checkAnnotation(Field field, Class<?> classToCheck) {
         MapToDTO declaredAnnotation = field.getDeclaredAnnotation(MapToDTO.class);
         if (declaredAnnotation != null && declaredAnnotation.mapClass().length != 0) {
@@ -60,9 +70,10 @@ public final class EntityMapper {
     private boolean isDTOField(Field field) {
         if (field.getGenericType() instanceof ParameterizedType) {
             ParameterizedType genericType = (ParameterizedType) field.getGenericType();
-            return genericType.getActualTypeArguments()[0].getTypeName().endsWith("DTO");
+            Class<?> actualTypeArgument = (Class<?>) genericType.getActualTypeArguments()[0];
+            return actualTypeArgument.isAnnotationPresent(DTO.class);
         }
-        return field.getType().getTypeName().endsWith("DTO");
+        return field.getType().isAnnotationPresent(DTO.class);
     }
 
     private <T> Object setInternalDTOFields(T entity, Class<?> type, Field actualField) {
@@ -134,10 +145,6 @@ public final class EntityMapper {
             return (Set<?>) entity;
         }
         return null;
-    }
-
-    public Class<?> getClassToCheck() {
-        return classToCheck;
     }
 
     public void setClassToCheck(Class<?> classToCheck) {

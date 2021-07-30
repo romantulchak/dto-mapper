@@ -38,5 +38,6 @@ return entityMapperInvoker.entityToDTO(entity object, DTO.class, mapClass from t
 ```
 
 
-**_The DTO class name must contain a DTO at the end of the name_**
+
+**Use the "associatedField" property in the ```@MapToDTO``` annotation if your variable in the DTO has a different name than in the Entity**
  

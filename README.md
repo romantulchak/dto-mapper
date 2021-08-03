@@ -27,13 +27,24 @@ private EntityMapperInvoker<YourDTO, YourEntity> entityMapperInvoker;
 4. Mark the fields in the DTO that you want to be mapped using 
 ```java  
 @MapToDTO(mapClass = {View.TripView.class, View.SeatTripView.class})
+private long id;
 ```
 mapClass is needed to avoid loops that work like JsonView
  
-5. And in your method just add next line
+5. Mark the DTO class 
+```java  
+@DTO
+public class CityDTO {
+//your code
+}
+```
+
+6. And in your method just add next line
 ```java
 return entityMapperInvoker.entityToDTO(entity object, DTO.class, mapClass from the annotation); 
 ```
+
+
 
 
 

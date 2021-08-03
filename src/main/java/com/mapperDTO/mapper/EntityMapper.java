@@ -2,6 +2,7 @@ package com.mapperDTO.mapper;
 
 import com.mapperDTO.annotation.DTO;
 import com.mapperDTO.annotation.MapToDTO;
+import com.mapperDTO.exception.CollectionEmptyException;
 import com.mapperDTO.exception.CreateClassInstanceException;
 import org.hibernate.Hibernate;
 import org.hibernate.collection.internal.PersistentBag;
@@ -29,12 +30,12 @@ public final class EntityMapper {
 
 
     private <T, R> void handleExistsField(T entity, R dto, List<Field> entityFields, Field field) {
-        for (Field busFieldOk : entityFields) {
+        for (Field entityField : entityFields) {
             try {
-                busFieldOk.setAccessible(true);
-                if (checkAssociatedField(field, busFieldOk) && checkAnnotation(field, classToCheck)) {
-                    Object value = busFieldOk.get(entity);
-                    entityFields.remove(busFieldOk);
+                entityField.setAccessible(true);
+                if (checkAssociatedField(field, entityField) && checkAnnotation(field, classToCheck)) {
+                    Object value = entityField.get(entity);
+                    entityFields.remove(entityField);
                     if (value != null) {
                         field.setAccessible(true);
                         if (isDTOField(field)) {
@@ -50,7 +51,7 @@ public final class EntityMapper {
         }
     }
 
-    private boolean checkAssociatedField(Field field, Field fieldToCompare){
+    private boolean checkAssociatedField(Field field, Field fieldToCompare) {
         MapToDTO annotation = field.getDeclaredAnnotation(MapToDTO.class);
         if (annotation != null && !annotation.associatedField().isEmpty()) {
             return annotation.associatedField().equals(fieldToCompare.getName());
@@ -86,7 +87,6 @@ public final class EntityMapper {
     }
 
 
-
     private <T> boolean checkObjectInstance(T entity, Class<?> obj) {
         return obj.isInstance(entity);
     }
@@ -99,7 +99,6 @@ public final class EntityMapper {
     }
 
     private Collection<Object> mapPersistentBagOfElements(Collection<?> entity, Class<?> type, Field actualField) {
-        Object internalDto;
         if (Hibernate.isInitialized(entity) && !entity.isEmpty()) {
             ParameterizedType genericType = (ParameterizedType) actualField.getGenericType();
             Collection<Object> collection = newCollectionInstance(type);
@@ -108,8 +107,8 @@ public final class EntityMapper {
                 List<Field> entityFields = new LinkedList<>(Arrays.asList(entity
                         .stream()
                         .findFirst()
-                        .orElseThrow(() -> new RuntimeException("Collection is empty")).getClass().getDeclaredFields()));
-                internalDto = newInstanceOfType(type);
+                        .orElseThrow(CollectionEmptyException::new).getClass().getDeclaredFields()));
+                Object internalDto = newInstanceOfType(type);
                 handleFields(object, entityFields, internalDto, type.getDeclaredFields());
                 collection.add(internalDto);
             }

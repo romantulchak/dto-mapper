@@ -10,8 +10,14 @@ import java.util.List;
 
 import static com.mapperDTO.mapper.ClassUtility.newInstanceOfType;
 
+/***
+ * Use this class to map your Entity to DTO
+ * @param <E> - Entity class
+ * @param <D> - DTO class
+ */
+
 @Component
-public final class EntityMapperInvoker<D, E> {
+public final class EntityMapperInvoker<E, D> {
 
     private EntityMapper entityMapper;
 

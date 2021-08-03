@@ -22,7 +22,7 @@ public class ApplicationConfig {
 3. Autowire EntityMapperInvoker into your service
 ```java
 @Autowired
-private EntityMapperInvoker<YourDTO, YourEntity> entityMapperInvoker;
+private EntityMapperInvoker<YourEntity, YourDTO> entityMapperInvoker;
 ```
 4. Mark the fields in the DTO that you want to be mapped using 
 ```java  

@@ -4,6 +4,7 @@ import com.mapperDTO.annotation.DTO;
 import com.mapperDTO.annotation.MapToDTO;
 import com.mapperDTO.exception.CollectionEmptyException;
 import com.mapperDTO.exception.CreateClassInstanceException;
+import com.mapperDTO.exception.FieldNotDTOException;
 import org.hibernate.Hibernate;
 import org.hibernate.collection.internal.PersistentBag;
 import org.springframework.stereotype.Component;
@@ -46,7 +47,7 @@ public final class EntityMapper {
                     break;
                 }
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                throw new FieldNotDTOException(field.getName());
             }
         }
     }

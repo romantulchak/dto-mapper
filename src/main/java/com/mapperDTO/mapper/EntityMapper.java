@@ -118,9 +118,16 @@ public final class EntityMapper {
         return Collections.emptyList();
     }
 
-    public <T> void handleFields(T entity, List<Field> entityFields, Object internalDto, Field[] declaredFields) {
-        for (Field field : declaredFields) {
-            handleExistsField(entity, internalDto, entityFields, field);
+    /**
+     * Converts an entity field to a DTO field
+     * @param entity entity (model)
+     * @param entityFields list of fields that are in Entity
+     * @param dto instance of DTO class
+     * @param dtoFields list of fields that are in DTO
+     */
+    public <T> void handleFields(T entity, List<Field> entityFields, Object dto, Field[] dtoFields) {
+        for (Field field : dtoFields) {
+            handleExistsField(entity, dto, entityFields, field);
         }
     }
 

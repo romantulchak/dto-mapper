@@ -12,8 +12,8 @@ import static com.mapperDTO.mapper.ClassUtility.newInstanceOfType;
 
 /***
  * Use this class to map your Entity to DTO
- * @param <E> - Entity class
- * @param <D> - DTO class
+ * @param <E> Entity class
+ * @param <D> DTO class
  */
 
 @Component
@@ -21,6 +21,13 @@ public final class EntityMapperInvoker<E, D> {
 
     private EntityMapper entityMapper;
 
+    /**
+     * Convert entity to DTO class
+     * @param entity entity class (model)
+     * @param dtoClass DTO class
+     * @param classToCheck class that using in @{@link com.mapperDTO.annotation.MapToDTO} mapClass property
+     * @return
+     */
     @SuppressWarnings("unchecked")
     public D entityToDTO(E entity, Class<?> dtoClass, Class<?> classToCheck) {
         D dto = (D) newInstanceOfType(dtoClass);

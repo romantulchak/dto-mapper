@@ -47,7 +47,8 @@ return entityMapperInvoker.entityToDTO(entity object, DTO.class, mapClass from t
 
 
 **DTO class must contain constructor without any arguments**
-**If the DTO class contains fields of type DTO - these classes should also be marked as ```@DTO```
+
+**If the DTO class contains fields of type DTO - these classes should also be marked as ```@DTO```**
 
 **Use the "associatedField" property in the ```@MapToDTO``` annotation if your variable in the DTO has a different name than in the Entity**
  

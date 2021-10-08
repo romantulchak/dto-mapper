@@ -33,9 +33,18 @@ public final class EntityMapperInvoker<E, D> {
         D dto = (D) newInstanceOfType(dtoClass);
         Field[] dtoFields = dto.getClass().getDeclaredFields();
         List<Field> entityFields = new LinkedList<>(Arrays.asList(entity.getClass().getDeclaredFields()));
+        getParentFields(entity, entityFields);
         entityMapper.setClassToCheck(classToCheck);
         entityMapper.handleFields(entity, entityFields, dto, dtoFields);
         return dto;
+    }
+
+
+    private <T> void getParentFields(T entity, List<Field> entityFields) {
+        Class<?> superclass = entity.getClass().getSuperclass();
+        if(!superclass.isAssignableFrom(Object.class)){
+            entityFields.addAll(Arrays.asList(superclass.getDeclaredFields()));
+        }
     }
 
     @Autowired

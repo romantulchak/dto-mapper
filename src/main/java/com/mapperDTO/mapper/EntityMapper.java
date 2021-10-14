@@ -44,7 +44,7 @@ public final class EntityMapper {
                     Object value = entityField.get(entity);
                     entityFields.remove(entityField);
                     if (value != null) {
-                        field.setAccessible(true);
+                         field.setAccessible(true);
                         if (isDTOField(field)) {
                             value = setInternalDTOFields(value, field.getType(), field);
                             logger.debug("field {} marked as @DTO", field.getName());
@@ -111,7 +111,8 @@ public final class EntityMapper {
         List<Field> entityFields = new LinkedList<>(Arrays.asList(entity.getClass().getDeclaredFields()));
         logger.debug("Entity field size - {}", entityFields.size());
         Object internalDto = newInstanceOfType(type);
-        handleFields(entity, entityFields, internalDto, type.getDeclaredFields());
+        List<Field> dtoFields = Arrays.asList(type.getDeclaredFields());
+        handleFields(entity, entityFields, internalDto, dtoFields);
         return internalDto;
     }
 
@@ -132,7 +133,8 @@ public final class EntityMapper {
                         .getDeclaredFields()));
                 Object internalDto = newInstanceOfType(type);
                 logger.debug("new internal object type - {}", internalDto.getClass());
-                handleFields(object, entityFields, internalDto, type.getDeclaredFields());
+                List<Field> dtoFields = Arrays.asList(type.getDeclaredFields());
+                handleFields(object, entityFields, internalDto, dtoFields);
                 collection.add(internalDto);
             }
             return collection;
@@ -144,11 +146,11 @@ public final class EntityMapper {
      * Converts an entity field to a DTO field
      *
      * @param entity       entity (model)
-     * @param entityFields list of fields that are in Entity
+     * @param entityFields list of fields that are in Entity or in parent Entity
      * @param dto          instance of DTO class
-     * @param dtoFields    list of fields that are in DTO
+     * @param dtoFields    list of fields that are in DTO or in parent DTO
      */
-    public <T> void handleFields(T entity, List<Field> entityFields, Object dto, Field[] dtoFields) {
+    public <T> void handleFields(T entity, List<Field> entityFields, Object dto, List<Field> dtoFields) {
         for (Field field : dtoFields) {
             logger.debug("handle field - {}", field.getName());
             handleExistsField(entity, dto, entityFields, field);

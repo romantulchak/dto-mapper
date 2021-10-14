@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,24 +27,25 @@ public final class EntityMapperInvoker<E, D> {
      * @param entity entity class (model)
      * @param dtoClass DTO class
      * @param classToCheck class that using in @{@link com.mapperDTO.annotation.MapToDTO} mapClass property
-     * @return
+     * @return dto with filled fields
      */
     @SuppressWarnings("unchecked")
     public D entityToDTO(E entity, Class<?> dtoClass, Class<?> classToCheck) {
         D dto = (D) newInstanceOfType(dtoClass);
-        Field[] dtoFields = dto.getClass().getDeclaredFields();
-        List<Field> entityFields = new LinkedList<>(Arrays.asList(entity.getClass().getDeclaredFields()));
+        List<Field> dtoFields = new ArrayList<>(Arrays.asList(dto.getClass().getDeclaredFields()));
+        List<Field> entityFields = new ArrayList<>(Arrays.asList(entity.getClass().getDeclaredFields()));
         getParentFields(entity, entityFields);
+        getParentFields(dto, dtoFields);
         entityMapper.setClassToCheck(classToCheck);
         entityMapper.handleFields(entity, entityFields, dto, dtoFields);
         return dto;
     }
 
 
-    private <T> void getParentFields(T entity, List<Field> entityFields) {
-        Class<?> superclass = entity.getClass().getSuperclass();
+    private <T> void getParentFields(T element, List<Field> fields) {
+        Class<?> superclass = element.getClass().getSuperclass();
         if(!superclass.isAssignableFrom(Object.class)){
-            entityFields.addAll(Arrays.asList(superclass.getDeclaredFields()));
+            fields.addAll(Arrays.asList(superclass.getDeclaredFields()));
         }
     }
 

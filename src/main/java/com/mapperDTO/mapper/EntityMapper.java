@@ -108,7 +108,7 @@ public final class EntityMapper {
     }
 
     private <T> Object mapSingleObject(T entity, Class<?> type) {
-        List<Field> entityFields = new LinkedList<>(Arrays.asList(entity.getClass().getDeclaredFields()));
+        List<Field> entityFields = getAllFields(entity);
         logger.debug("Entity field size - {}", entityFields.size());
         Object internalDto = newInstanceOfType(type);
         List<Field> dtoFields = Arrays.asList(type.getDeclaredFields());
@@ -133,13 +133,28 @@ public final class EntityMapper {
                         .getDeclaredFields()));
                 Object internalDto = newInstanceOfType(type);
                 logger.debug("new internal object type - {}", internalDto.getClass());
-                List<Field> dtoFields = Arrays.asList(type.getDeclaredFields());
+                List<Field> dtoFields = getAllFields(type);
                 handleFields(object, entityFields, internalDto, dtoFields);
                 collection.add(internalDto);
             }
             return collection;
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * Gets all fields from child class and also from parent class
+     *
+     * @param element from which you want to get the fields
+     * @return all fields for element (including parent fields)
+     */
+    private <T> List<Field> getAllFields(T element) {
+        List<Field> fields = new ArrayList<>(Arrays.asList(element.getClass().getDeclaredFields()));
+        Class<?> superclass = element.getClass().getSuperclass();
+        if(!superclass.isAssignableFrom(Object.class)){
+            fields.addAll(Arrays.asList(superclass.getDeclaredFields()));
+        }
+        return fields;
     }
 
     /**

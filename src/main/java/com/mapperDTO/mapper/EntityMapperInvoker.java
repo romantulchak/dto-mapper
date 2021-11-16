@@ -18,7 +18,7 @@ import static com.mapperDTO.mapper.ClassUtility.newInstanceOfType;
  */
 
 @Component
-public final class EntityMapperInvoker<E, D> {
+public class EntityMapperInvoker<E, D> {
 
     private EntityMapper entityMapper;
 
